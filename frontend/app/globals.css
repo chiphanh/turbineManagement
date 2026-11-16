@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap");
+
 :root {
   --bg: #f6f7f9;
   --ink: #172128;
@@ -12,7 +14,7 @@ body {
   margin: 0;
   color: var(--ink);
   background: var(--bg);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Ubuntu", system-ui, sans-serif;
   font-size: 14px;
 }
 button,
@@ -69,13 +71,16 @@ label select,
 label textarea {
   margin-top: 7px;
 }
+
 textarea {
   resize: vertical;
 }
+
 .shell {
   display: flex;
   min-height: 100vh;
 }
+
 .sidebar {
   width: 225px;
   flex-shrink: 0;
@@ -87,6 +92,13 @@ textarea {
   display: flex;
   flex-direction: column;
 }
+
+.sidebar a.nav,
+.sidebar a.nav:hover,
+.sidebar a.nav:focus-visible {
+  text-decoration: none;
+}
+
 .brand {
   font-size: 30px;
   color: var(--accent);

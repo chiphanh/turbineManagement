@@ -13,6 +13,7 @@ import {
   ValidationPipe,
 } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
+import { DatabaseService } from "./database.service";
 import { ProjectsService } from "./projects.service";
 import {
   CreateProjectDto,
@@ -26,11 +27,11 @@ import {
   CreateTeamDto,
   UpdateTeamDto,
 } from "./operations.dto";
-import { AiService } from "./ai/ai.service";
-import { AiController } from "./ai/ai.controller";
-import { ProjectsModule } from "./projects.module";
-import { AiModule } from "./ai/ai.module";
 
+import { AiController } from "./ai/ai.controller";
+import { AiService } from "./ai/ai.service";
+import { AiGuard } from "./ai/ai.guard";
+import { EvaluationService } from "./ai/evaluation.service";
 @Controller("projects")
 class ProjectsController {
   constructor(
@@ -98,15 +99,21 @@ class HealthController {
   }
 }
 @Module({
-  imports: [ProjectsModule, AiModule],
   controllers: [
+    AiController,
     ProjectsController,
     TeamsController,
     BookingsController,
     HealthController,
-    AiController,
   ],
-  providers: [OperationsService, AiService],
+  providers: [
+    AiGuard,
+    AiService,
+    EvaluationService,
+    DatabaseService,
+    ProjectsService,
+    OperationsService,
+  ],
 })
 class AppModule {}
 async function bootstrap() {
@@ -123,12 +130,17 @@ async function bootstrap() {
     origin: process.env.FRONTEND_ORIGIN ?? "http://localhost:3000",
   });
   app.enableShutdownHooks();
-  await app.listen(Number(process.env.PORT ?? 3001), "127.0.0.1");
+  console.log("process.env", process.env.HOST, process.env.GROQ_API_KEY);
+  await app.listen(
+    Number(process.env.PORT ?? 3001),
+    process.env.HOST ?? "127.0.0.1"
+  );
 }
 
-bootstrap().catch(() => {
+bootstrap().catch((error: unknown) => {
   console.error(
-    "Startup failed. Check DATABASE_URL, PORT and your environment configuration."
+    "Startup failed. Check DATABASE_URL, migrations, PORT and your environment configuration.",
+    error
   );
   process.exit(1);
 });

@@ -11,7 +11,7 @@ export class ProjectsService {
     if (query.stage) { args.push(query.stage); clauses.push(`stage = $${args.length}`); }
     if (query.search?.trim()) {
       args.push(query.search.trim());
-      clauses.push(`(strpos(lower(customer_name), lower($${args.length})) > 0 OR strpos(lower(address), lower($${args.length})) > 0)`);
+      clauses.push(`(strpos(lower(customer_name), lower($${args.length})) > 0 OR strpos(lower(address), lower($${args.length})) > 0 OR strpos(lower(notes), lower($${args.length})) > 0)`);
     }
     const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
     // One query returns a count even for an empty/out-of-range page.

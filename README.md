@@ -1,6 +1,6 @@
 A turbine installation tracker with project management, team assignment, and scheduling that prevents overlapping bookings.
 
-**Stack:** Next.js, TypeScript, NestJS, PostgreSQL (Neon).
+**Stack:** Next.js, TypeScript, NestJS, PostgreSQL (Neon because it's free :D).
 
 ## Run locally
 

@@ -6,8 +6,12 @@ import {
   faDiagramProject,
   faUsers,
   faCalendarDays,
-  faTurbi,
+  faWandMagicSparkles,
+  faChartBar,
+  faFan,
 } from "@fortawesome/free-solid-svg-icons";
+
+import Sidebar from "../components/Sidebar";
 
 type Stage = "inspection" | "planning" | "installation" | "completed";
 type Project = {
@@ -239,35 +243,32 @@ export default function Dashboard() {
       setBookingProject(null);
     }, "Installation scheduled");
   }
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const view = params.get("view");
+    if (view === "schedule" || view === "teams") setView(view);
+    const id = params.get("project");
+    if (!id || !/^[a-f0-9-]{36}$/i.test(id)) return;
+    let active = true;
+    api<Project>("/projects/" + id)
+      .then((project) => {
+        if (active) {
+          setView("projects");
+          setSelected(project);
+        }
+      })
+      .catch(() => {
+        if (active) setError("Could not open that project.");
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
   const activeBookings = bookings.filter((b) => b.status === "scheduled");
   const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   return (
     <div className="shell">
-      <aside className="sidebar">
-        <a className="brand" href="/">
-          ✳ <span>TurbineOps</span>
-        </a>
-        <p className="eyebrow">WORKSPACE</p>
-        <nav>
-          {(["projects", "teams", "schedule"] as const).map((v, i) => (
-            <button
-              key={v}
-              className={view === v ? "nav active" : "nav"}
-              onClick={() => setView(v)}
-            >
-              <FontAwesomeIcon
-                icon={[faDiagramProject, faUsers, faCalendarDays][i]}
-                aria-hidden="true"
-              />
-              {title(v)}
-            </button>
-          ))}
-        </nav>
-        <div className="sideFoot">
-          <span className="dot" /> Local development
-          <p>Installation management</p>
-        </div>
-      </aside>
+      <Sidebar active={view} onViewChange={setView} />
       <main>
         <header>
           <div>
@@ -279,13 +280,6 @@ export default function Dashboard() {
                 ? "Your installation teams"
                 : "Installation schedule"}
             </h1>
-            <p className="subtitle">
-              {view === "projects"
-                ? "From first inspection to final handover."
-                : view === "teams"
-                ? "Build the teams that move projects forward."
-                : "Reserve time. Keep every team on track."}
-            </p>
           </div>
           {view === "projects" && (
             <button
@@ -585,11 +579,7 @@ export default function Dashboard() {
               ) : (
                 <div className="placeholder">
                   <span>↗</span>
-                  <h2>A closer look</h2>
-                  <p>
-                    Open a project to edit its details, notes, and team
-                    assignment.
-                  </p>
+                  <p>Click on the arrow to view and edit project notes</p>
                 </div>
               )}
             </section>
